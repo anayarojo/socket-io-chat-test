@@ -1,2 +1,2 @@
-# socket-io-chat-test
+# Socket IO Chat Test
 Creación de chat utilizando Socket IO
