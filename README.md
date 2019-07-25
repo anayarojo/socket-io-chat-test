@@ -5,5 +5,4 @@ Creación de chat utilizando Socket IO
 ![alt](images/io-chat-demo.png)
 
 ### Documentation
-
-
+https://socket.io/get-started/chat/
