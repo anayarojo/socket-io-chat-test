@@ -1,9 +1,14 @@
 var app = require('express')();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
+var port = process.env.PORT || 3000; 
 
 app.get('/', function(request, response){
     response.sendFile(`${__dirname}/public/index.html`);
+});
+
+app.get('/favicon.ico', function(request, response){
+    response.sendFile(`${__dirname}/public/favicon.ico`);
 });
 
 io.on('connection', function(socket){
@@ -18,6 +23,6 @@ io.on('connection', function(socket){
     });
 });
 
-http.listen(3000, function(){
-    console.log('Listening on *:3000');
+http.listen(port, function(){
+    console.log(`Listening on *:${port}`);
 });
