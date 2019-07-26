@@ -1,14 +1,13 @@
-var app = require('express')();
+var express = require('express');
+var app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 var port = process.env.PORT || 3000; 
 
+app.use(express.static(__dirname + '/public'));
+
 app.get('/', function(request, response){
     response.sendFile(`${__dirname}/public/index.html`);
-});
-
-app.get('/favicon.ico', function(request, response){
-    response.sendFile(`${__dirname}/public/favicon.ico`);
 });
 
 io.on('connection', function(socket){
@@ -17,6 +16,10 @@ io.on('connection', function(socket){
     socket.on('chat message', function(message) {
         io.emit('chat message', message);
         console.log(`Chat message: ${message}`);
+    });
+    socket.on('chat message object', function(message) {
+        io.emit('chat message object', message);
+        console.log(`Chat message object: ${message}`);
     });
     socket.on('disconnect', function(){
         console.log('User disconnected');
