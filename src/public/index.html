@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>ChatIO</title>
+    <style>
+      html, body { padding: 0; margin: 0; }
+      #main-container { position: absolute; width: 100%; height: 100%; }
+    </style>
+  </head>
+  <body>
+
+    <div id="main-container" class="d-flex flex-column align-items-stretch">
+
+    <!-- #region Messages History -->
+      <div class="container-fluid bg-light flex-fill overflow-auto">
+        <ul id="messages-list" class="list-group mt-3 mb-3">
+          <!-- <li class="list-group-item">
+            <div class="message-item d-flex flex-row align-items-start">
+              <img class="mr-3" width="48" height="48" src="img/user-profile-1.svg" alt="Profile">
+              <div class="d-flex flex-column flex-fill">
+                <p class="font-weight-bold m-0">Sistema</p>
+                <p class="font-weight-normal text-body m-0">Bienvenido a ChatIO</p>
+              </div>
+            </div>
+            <p class="font-weight-lighter text-right text-secondary m-0">20190726 0732</p>
+          </li> -->
+        </ul>
+      </div>
+    <!-- #endregion Messages History -->
+
+    <!-- #region Form -->
+      <div class="container-fluid bg-info pt-3">
+        <form action="">
+          <div class="input-group mb-3">
+            <input type="text" id="m" autocomplete="off" class="form-control" placeholder="Mensaje" aria-label="Mensaje" aria-describedby="button-addon2">
+            <div class="input-group-append">
+              <button class="btn btn-secondary" type="submit" id="button-addon2">Enviar</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    <!-- #endregion Form -->
+
+    </div>
+
+    <!-- #region Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">¿Quieres unirte al chat?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="user-name" class="col-form-label">Nombre:</label>
+                        <input type="text" class="form-control" id="user-name">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Continuar</button>
+                <button type="button" class="btn btn-info">Unirse</button>
+            </div>
+            </div>
+        </div>
+    </div>
+    <!-- #endregion JavaScript -->
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/locale/es.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        $(function () {
+            
+            var socket = io();
+            var user = 'Anónimo';
+            var avatar = 1;
+
+            var modal = $('#exampleModal');
+            var txtUserName = modal.find('#user-name');
+            var btnJoin = modal.find('.btn.btn-info');
+
+            // Handle join
+
+            avatar = Math.floor((Math.random() * 20) + 1);
+            modal.find('.modal-body').prepend(`<img class="d-block ml-auto mr-auto" width="72" height="72" src="img/user-profile-${avatar}.svg" alt="Profile">`);
+
+            modal.modal('show');
+            btnJoin.click(function(e){
+                let userName = txtUserName.val().trim();
+                if(userName != ''){
+                    user = userName;
+                    socket.emit('chat message object', { 
+                        avatar: 1,
+                        user: 'Sistema', 
+                        text: `${user} se ha unido`,
+                        date: moment().format('DD/MM/YYYY h:mm:ss a')
+                    });
+                }
+                modal.modal('hide');
+            });
+
+            // Handle emit
+
+            $('form').submit(function(e){
+                e.preventDefault(); // prevents page reloading
+                socket.emit('chat message object', { 
+                    avatar, 
+                    user, 
+                    text: $('#m').val().trim(),
+                    date: moment().format('DD/MM/YYYY h:mm:ss a')
+                });
+                $('#m').val('');
+                return false;
+            });
+
+            // Handle reception
+
+            socket.on('chat message object', function(msg){
+                let message = `<li class="list-group-item">
+                    <div class="message-item d-flex flex-row align-items-start">
+                    <img class="mr-3" width="48" height="48" src="img/user-profile-${msg.avatar}.svg" alt="Profile">
+                    <div class="d-flex flex-column flex-fill">
+                        <p class="font-weight-bold m-0">${msg.user}</p>
+                        <p class="font-weight-normal text-body m-0">${msg.text}</p>
+                    </div>
+                    </div>
+                    <p class="font-weight-lighter text-right text-secondary m-0">${msg.date}</p>
+                </li>`;
+                $('#messages-list').append(message);
+            });
+
+        });
+    </script>
+  </body>
+</html>
