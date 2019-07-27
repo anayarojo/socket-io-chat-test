@@ -24,27 +24,27 @@ server.app.get('/', function(request, response) {
 });
 
 // Connect Socket IO
-// io.on('connection', function(socket: Socket){
-//     console.log('A user connected');
-//     socket.on('chat message', function(message: any) {
-//         io.emit('chat message', message);
-//         console.log(`Chat message: ${message}`);
-//     });
-//     socket.on('chat message object', function(message: any) {
-//         io.emit('chat message object', message);
-//         console.log(`Chat message object: ${message}`);
-//     });
-//     socket.on('disconnect', function(){
-//         console.log('User disconnected');
-//     });
-// });
+io.on('connection', function(socket: Socket){
+    console.log('A user connected');
+    socket.on('chat message', function(message: any) {
+        io.emit('chat message', message);
+        console.log(`Chat message: ${message}`);
+    });
+    socket.on('chat message object', function(message: any) {
+        io.emit('chat message object', message);
+        console.log(`Chat message object: ${message}`);
+    });
+    socket.on('disconnect', function(){
+        console.log('User disconnected');
+    });
+});
 
 // Connect with MongoDB
 const connectCallback = (err: MongoError) => {
     if (err) { throw err; }
 };
 
-mongose.connect('mongodb://localhost:27017/photogram', {
+mongose.connect('mongodb+srv://mongo-admin:kgNMkV6xPZnU4cGG@cluster0-3cnfb.mongodb.net/test?retryWrites=true&w=majority', {
     useNewUrlParser: true,
     useCreateIndex: true,
 }, connectCallback);

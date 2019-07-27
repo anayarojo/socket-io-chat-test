@@ -21,9 +21,8 @@ userSchema.method('comparePassword', function(password: string = ''): boolean {
 });
 
 interface IUser extends Document {
-    name: string;
     avatar: string;
-    email: string;
+    name: string;
     password: string;
     comparePassword(password: string): boolean;
 }
